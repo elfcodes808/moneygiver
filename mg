@@ -1,14 +1,15 @@
+-- Your entire script should go here
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 
--- Variables for webhook and money-giver inputs
-local webhookURL = "" -- This will be set via the GUI
+-- Set the initial variables
+local webhookURL = "" -- This will be set via the UI
 local recipientName = ""
 local amountToGive = 0
 
 -- Admin check function
 local function isAdmin(player)
-    return player.UserId == 12345678 -- Replace with your admin UserId
+    return player.UserId == 12345678 -- Replace with your UserId for admin check
 end
 
 -- Function to log transactions to a webhook
@@ -23,7 +24,7 @@ local function logTransaction(admin, recipient, amount)
         ["embeds"] = {{
             ["title"] = "Money Given",
             ["description"] = string.format("**Admin:** %s\n**Recipient:** %s\n**Amount:** %d", admin.Name, recipient.Name, amount),
-            ["color"] = 0x00FF00, -- Green
+            ["color"] = 0x00FF00, -- Green color
         }},
     }
 
@@ -36,7 +37,7 @@ local function logTransaction(admin, recipient, amount)
     end
 end
 
--- Initialize Rayfield UI
+-- Initialize Rayfield UI library
 local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Rayfield/main/source"))()
 
 local Window = Rayfield:CreateWindow({
@@ -45,13 +46,13 @@ local Window = Rayfield:CreateWindow({
     LoadingSubtitle = "Please wait...",
     ConfigurationSaving = {
         Enabled = true,
-        FolderName = "MoneyGiver", -- Saved configurations folder
-        FileName = "AdminConfig", -- Saved configurations file
+        FolderName = "MoneyGiver",
+        FileName = "AdminConfig",
     },
     KeySystem = false,
 })
 
--- Webhook setup
+-- Webhook setup input
 Window:CreateInput({
     Name = "Webhook URL",
     PlaceholderText = "Enter your Discord webhook URL",
@@ -67,7 +68,7 @@ Window:CreateInput({
     end,
 })
 
--- Input for recipient name
+-- Recipient name input
 Window:CreateInput({
     Name = "Recipient Username",
     PlaceholderText = "Enter recipient's name",
@@ -77,7 +78,7 @@ Window:CreateInput({
     end,
 })
 
--- Input for amount
+-- Amount input
 Window:CreateInput({
     Name = "Amount",
     PlaceholderText = "Enter amount to give",
@@ -93,7 +94,7 @@ Window:CreateButton({
     Callback = function()
         local player = Players.LocalPlayer
 
-        -- Check if the player is an admin
+        -- Admin check
         if not isAdmin(player) then
             Rayfield:Notify({
                 Title = "Permission Denied",
@@ -104,7 +105,7 @@ Window:CreateButton({
             return
         end
 
-        -- Validate inputs
+        -- Check if webhook URL is set
         if webhookURL == "" then
             Rayfield:Notify({
                 Title = "Error",
@@ -115,6 +116,7 @@ Window:CreateButton({
             return
         end
 
+        -- Validate recipient
         local recipient = Players:FindFirstChild(recipientName)
         if not recipient then
             Rayfield:Notify({
@@ -126,6 +128,7 @@ Window:CreateButton({
             return
         end
 
+        -- Validate amount
         if not amountToGive or amountToGive <= 0 then
             Rayfield:Notify({
                 Title = "Error",
@@ -136,7 +139,7 @@ Window:CreateButton({
             return
         end
 
-        -- Update recipient's money
+        -- Add money to recipient
         local leaderstats = recipient:FindFirstChild("leaderstats")
         if leaderstats and leaderstats:FindFirstChild("Money") then
             leaderstats.Money.Value = leaderstats.Money.Value + amountToGive
